@@ -1,0 +1,16 @@
+{
+  "name": "NeuroVault Case Registry",
+  "short_name": "NeuroVault",
+  "description": "Private neurosurgical case registry",
+  "start_url": "/neurovault/",
+  "display": "standalone",
+  "background_color": "#080e0a",
+  "theme_color": "#080e0a",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/080e0a/2adf7a?text=NV",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
