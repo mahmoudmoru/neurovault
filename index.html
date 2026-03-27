@@ -7,100 +7,608 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="NeuroVault"/>
 <meta name="theme-color" content="#080e0a"/>
-<title>NeuroVault — Case Registry</title>
-<link rel="manifest" href="manifest.json"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet"/>
+<title>NeuroVault</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #080e0a; --bg2: #0d1a10; --bg3: #0f2018;
-    --border: #1a3a22; --border2: #2a5a3a;
-    --green: #2adf7a; --green2: #1a9a55; --green3: #4aff9a;
-    --text: #d8eed8; --text2: #8ab89a; --text3: #4a7a5a;
-    --red: #f08080; --amber: #d0a060; --blue: #60a8d0;
-    --font-display: 'Playfair Display', Georgia, serif;
-    --font-mono: 'Source Code Pro', monospace;
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080e0a;--bg2:#0d1a10;--border:#1a3a22;--border2:#2a5a3a;
+  --green:#1a9a55;--green3:#4aff9a;--text:#d8eed8;--text2:#8ab89a;--text3:#4a7a5a;
+  --red:#f08080;--amber:#d0a060;--blue:#60a8d0;
+  --fd:'Playfair Display',serif;--fm:'Source Code Pro',monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fm);overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+#auth{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:radial-gradient(ellipse at 50% 0%,#0d2a18,var(--bg) 70%)}
+.auth-logo{font-family:var(--fd);font-size:44px;color:var(--green3);letter-spacing:2px;margin-bottom:4px}
+.auth-sub{font-size:10px;letter-spacing:4px;color:var(--text3);text-transform:uppercase;margin-bottom:40px}
+.auth-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:32px;width:100%;max-width:360px}
+.tab-row{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:22px}
+.tab{flex:1;padding:9px;text-align:center;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:var(--text3);transition:all .2s}
+.tab.on{background:var(--green);color:#001a08;font-weight:600}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.field input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);padding:10px 12px;font-family:var(--fm);font-size:13px;outline:none}
+.field input:focus{border-color:var(--green)}
+.btn-full{width:100%;padding:13px;background:var(--green);color:#001a08;border:none;border-radius:6px;font-family:var(--fm);font-size:12px;font-weight:600;letter-spacing:1px;cursor:pointer;margin-bottom:10px}
+.btn-full:disabled{opacity:.5;cursor:not-allowed}
+.auth-msg{font-size:11px;text-align:center;min-height:16px;margin-top:8px;line-height:1.5}
+.auth-note{font-size:10px;color:var(--text3);text-align:center;margin-top:14px;line-height:1.6}
+.link-text{font-size:10px;color:var(--text3);cursor:pointer;text-decoration:underline;text-align:center;display:block}
+#app{display:none;flex-direction:column;min-height:100vh}
+.hdr{background:#060c08;border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:0;z-index:100}
+.hdr-in{max-width:860px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:54px}
+.logo{display:flex;align-items:center;gap:9px}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.logo-txt{font-family:var(--fd);font-size:17px;color:var(--green3);letter-spacing:1px}
+.btn-new{background:var(--green);color:#001a08;padding:7px 14px;border:none;border-radius:5px;font-family:var(--fm);font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer}
+.nav{background:#060c08;border-bottom:1px solid var(--border);padding:0 16px}
+.nav-in{max-width:860px;margin:0 auto;display:flex}
+.ntab{padding:10px 14px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;white-space:nowrap}
+.ntab.on{color:var(--green3);border-bottom-color:var(--green)}
+.pg{max-width:860px;margin:0 auto;width:100%;padding:22px 16px}
+.sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:22px}
+@media(min-width:560px){.sgrid{grid-template-columns:repeat(4,1fr)}}
+.scard{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+.snum{font-family:var(--fd);font-size:38px;line-height:1;margin-bottom:3px}
+.slbl{font-size:9px;letter-spacing:2px;color:var(--text3);text-transform:uppercase}
+.clist{display:flex;flex-direction:column;gap:8px}
+.ccard{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:15px;cursor:pointer;transition:border-color .2s}
+.ccard:hover{border-color:var(--border2)}
+.ctop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:7px}
+.cdiag{font-family:var(--fd);font-size:15px;color:var(--text);line-height:1.3}
+.cdate{font-size:10px;color:var(--text3);white-space:nowrap}
+.cmeta{font-size:10px;color:var(--text3);margin-bottom:7px}
+.tags{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:3px;border:1px solid var(--border);color:var(--text2);background:var(--bg);text-transform:uppercase}
+.tag.pub{border-color:#3a6a1a;color:#90d050;background:#0a1404}
+.tag.neurotrauma{border-color:#4a2a0a;color:#d09060;background:#100804}
+.tag.tumour{border-color:#2a1a4a;color:#9080d0;background:#08040f}
+.tag.paediatric{border-color:#3a1a4a;color:#c090e0;background:#0f0810}
+.tag.spine{border-color:#0a2a4a;color:#5090d0;background:#04080f}
+.tag.vascular{border-color:#3a0a0a;color:#d06060;background:#0f0404}
+.fsec{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:14px}
+.fstitle{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
+.fi{margin-bottom:12px}
+.fi label{display:block;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.fi input,.fi select,.fi textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);padding:9px 11px;font-family:var(--fm);font-size:13px;outline:none;transition:border .2s;resize:vertical}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:var(--green)}
+.fi select option{background:var(--bg2)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:500px){.g2,.g3{grid-template-columns:1fr}}
+.pub-row{display:flex;align-items:center;gap:10px;padding:13px;background:#0a1804;border:1px solid #1a3a0a;border-radius:6px;cursor:pointer}
+.pub-row input{width:16px;height:16px;accent-color:var(--green);cursor:pointer}
+.pub-lbl{font-size:11px;letter-spacing:1px;color:#90d050;cursor:pointer}
+.save-bar{display:flex;gap:10px;align-items:center;padding-top:6px;flex-wrap:wrap}
+.btn-save{padding:11px 24px;background:var(--green);color:#001a08;border:none;border-radius:5px;font-family:var(--fm);font-size:12px;font-weight:600;letter-spacing:1px;cursor:pointer}
+.btn-save:disabled{opacity:.5;cursor:not-allowed}
+.btn{cursor:pointer;border:none;border-radius:5px;font-family:var(--fm);font-size:11px;letter-spacing:1px;text-transform:uppercase;transition:all .2s;padding:9px 14px}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-danger{background:#1a0808;color:var(--red);border:1px solid #3a1414}
+.dblock{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
+.dbtitle{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:11px}
+.drow{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.dl{font-size:9px;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-bottom:3px}
+.dv{font-size:13px;color:var(--text)}
+.dtxt{font-size:13px;color:var(--text2);line-height:1.8}
+.img-upload{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;background:var(--bg);border:1px dashed var(--border2);border-radius:5px;color:var(--text2);font-family:var(--fm);font-size:11px;cursor:pointer;margin-bottom:10px}
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.iitem{border-radius:6px;overflow:hidden;border:1px solid var(--border);position:relative}
+.iitem img{width:100%;height:85px;object-fit:cover;display:block}
+.iitem-lbl{padding:4px 6px;background:var(--bg)}
+.iitem-lbl input{width:100%;background:transparent;border:none;color:var(--text3);font-family:var(--fm);font-size:9px;outline:none}
+.iremove{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.75);border:none;color:var(--red);cursor:pointer;border-radius:50%;width:18px;height:18px;font-size:11px;display:flex;align-items:center;justify-content:center}
+.srow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sinp{flex:1;min-width:150px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;color:var(--text);padding:9px 11px;font-family:var(--fm);font-size:12px;outline:none}
+.sinp:focus{border-color:var(--green)}
+.fsel{background:var(--bg2);border:1px solid var(--border);border-radius:5px;color:var(--text2);padding:9px 8px;font-family:var(--fm);font-size:11px;outline:none}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:6px;font-family:var(--fm);font-size:11px;letter-spacing:1px;z-index:999;white-space:nowrap;animation:tin .3s ease}
+.tok{background:#0d2a18;border:1px solid var(--green);color:var(--green3)}
+.terr{background:#2a0d0d;border:1px solid #6a2a2a;color:var(--red)}
+@keyframes tin{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.back{display:flex;align-items:center;gap:5px;font-size:10px;letter-spacing:2px;color:var(--text3);cursor:pointer;text-transform:uppercase;margin-bottom:14px}
+.back:hover{color:var(--text2)}
+.sec-hd{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:11px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.empty{text-align:center;padding:50px 16px}
+.empty h3{font-family:var(--fd);font-size:20px;color:var(--text3);margin-bottom:8px}
+.empty p{font-size:10px;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:20px}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div id="auth">
+  <div class="auth-logo">NeuroVault</div>
+  <div class="auth-sub">Private Case Registry</div>
+  <div class="auth-box">
+    <div class="tab-row">
+      <div class="tab on" id="t-in" onclick="showTab('in')">Sign In</div>
+      <div class="tab" id="t-up" onclick="showTab('up')">Create Account</div>
+    </div>
+    <div id="f-in">
+      <div class="field"><label>Email</label><input type="email" id="in-email" placeholder="your@email.com" autocomplete="email"/></div>
+      <div class="field"><label>Password</label><input type="password" id="in-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doSignIn()"/></div>
+      <button class="btn-full" id="in-btn" onclick="doSignIn()">Sign In</button>
+      <span class="link-text" onclick="showTab('reset')">Forgot password?</span>
+    </div>
+    <div id="f-up" style="display:none">
+      <div class="field"><label>Full Name</label><input type="text" id="up-name" placeholder="Dr. Mahmoud..." autocomplete="name"/></div>
+      <div class="field"><label>Email</label><input type="email" id="up-email" placeholder="your@email.com" autocomplete="email"/></div>
+      <div class="field"><label>Password (min 6 chars)</label><input type="password" id="up-pass" placeholder="••••••••" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSignUp()"/></div>
+      <button class="btn-full" onclick="doSignUp()">Create Account</button>
+    </div>
+    <div id="f-reset" style="display:none">
+      <div class="field"><label>Email</label><input type="email" id="rs-email" placeholder="your@email.com"/></div>
+      <button class="btn-full" onclick="doReset()">Send Reset Link</button>
+      <span class="link-text" onclick="showTab('in')" style="margin-top:8px">← Back to Sign In</span>
+    </div>
+    <div class="auth-msg" id="auth-msg"></div>
+    <div class="auth-note">Private & secure — only you can access your cases</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-in">
+      <div class="logo"><div class="logo-dot"></div><span class="logo-txt">NeuroVault</span></div>
+      <button class="btn-new" onclick="newCase()">+ New Case</button>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-in">
+      <div class="ntab on" id="nt-dash" onclick="goPage('dash')">Overview</div>
+      <div class="ntab" id="nt-list" onclick="goPage('list')">Case Log</div>
+      <div class="ntab" id="nt-acct" onclick="goPage('acct')">Account</div>
+    </div>
+  </div>
+  <div class="pg" id="pg"></div>
+</div>
+
+<div id="toast-el" style="display:none"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+var sb = supabase.createClient(
+  'https://jcangkmaypiavwwlxglq.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjYW5na21heXBpYXZ3d2x4Z2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNTM2OTcsImV4cCI6MjA4OTYyOTY5N30.QnbCF-0BnOfedCCPIbJSHxXDTkMd0WIGVFqzfwlvHR0'
+);
+
+var CATS=['Neurotrauma','Tumour','Paediatric','Spine','Vascular','Functional','Other'];
+var PROCS=['Craniotomy','Craniectomy','Burr hole evacuation','VP Shunt','EVD insertion','ETV','ACDF','Posterior cervical fusion','Lumbar discectomy','Lumbar fusion','Stereotactic biopsy','Skull base surgery','Spinal tumour resection','Other'];
+var OUTCOMES=['Excellent','Good','Fair','Poor','Deceased','Lost to follow-up'];
+var RESECS=['Gross Total Resection','Near Total Resection','Subtotal Resection','Biopsy only','N/A'];
+
+var USER=null, CASES=[], PAGE='dash', EDIT_ID=null, IMGS=[], SEARCH='', FCAT='All', FPUB=false;
+
+function showTab(t) {
+  ['in','up','reset'].forEach(function(x){ document.getElementById('f-'+x).style.display=x===t?'block':'none'; });
+  var ti=document.getElementById('t-in'), tu=document.getElementById('t-up');
+  if(ti) ti.className='tab'+(t==='in'?' on':'');
+  if(tu) tu.className='tab'+(t==='up'?' on':'');
+  document.getElementById('auth-msg').textContent='';
+}
+
+function authMsg(m,err){
+  var el=document.getElementById('auth-msg');
+  el.textContent=m;
+  el.style.color=err?'var(--red)':'var(--green3)';
+}
+
+function doSignIn(){
+  var email=document.getElementById('in-email').value.trim();
+  var pass=document.getElementById('in-pass').value;
+  if(!email||!pass){authMsg('Enter email and password',true);return;}
+  var btn=document.getElementById('in-btn');
+  btn.disabled=true;btn.textContent='Signing in...';
+  sb.auth.signInWithPassword({email:email,password:pass}).then(function(r){
+    btn.disabled=false;btn.textContent='Sign In';
+    if(r.error) authMsg(r.error.message,true);
+  });
+}
+
+function doSignUp(){
+  var name=document.getElementById('up-name').value.trim();
+  var email=document.getElementById('up-email').value.trim();
+  var pass=document.getElementById('up-pass').value;
+  if(!email||!pass){authMsg('Fill all fields',true);return;}
+  if(pass.length<6){authMsg('Password min 6 characters',true);return;}
+  sb.auth.signUp({email:email,password:pass,options:{data:{full_name:name}}}).then(function(r){
+    if(r.error) authMsg(r.error.message,true);
+    else authMsg('Account created! You can now sign in.',false);
+  });
+}
+
+function doReset(){
+  var email=document.getElementById('rs-email').value.trim();
+  if(!email){authMsg('Enter your email',true);return;}
+  sb.auth.resetPasswordForEmail(email).then(function(r){
+    if(r.error) authMsg(r.error.message,true);
+    else authMsg('Reset link sent — check your email',false);
+  });
+}
+
+function doSignOut(){ sb.auth.signOut(); }
+
+sb.auth.onAuthStateChange(function(event, session){
+  if(session && session.user){
+    USER=session.user;
+    document.getElementById('auth').style.display='none';
+    document.getElementById('app').style.display='flex';
+    document.getElementById('app').style.flexDirection='column';
+    loadCases();
+  } else {
+    USER=null;
+    document.getElementById('auth').style.display='flex';
+    document.getElementById('app').style.display='none';
   }
-  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-mono); overflow-x: hidden; }
-  ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+});
 
-  /* AUTH SCREEN */
-  #auth-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; background: radial-gradient(ellipse at 50% 0%, #0d2a18 0%, var(--bg) 70%); }
-  .auth-logo { font-family: var(--font-display); font-size: 42px; color: var(--green3); letter-spacing: 2px; margin-bottom: 6px; }
-  .auth-sub { font-size: 10px; letter-spacing: 4px; color: var(--text3); text-transform: uppercase; margin-bottom: 48px; }
-  .auth-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 36px; width: 100%; max-width: 380px; text-align: center; }
-  .auth-desc { font-size: 12px; color: var(--text2); line-height: 1.8; margin-bottom: 28px; }
-  #google-signin-btn { width: 100%; padding: 14px 20px; background: #fff; color: #333; border: none; border-radius: 8px; font-family: var(--font-mono); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: opacity 0.2s; }
-  #google-signin-btn:hover { opacity: 0.92; }
-  #google-signin-btn svg { width: 20px; height: 20px; }
-  .auth-note { font-size: 10px; color: var(--text3); margin-top: 16px; line-height: 1.6; }
+function loadCases(){
+  sb.from('neurovault_cases').select('*').eq('user_id',USER.id).order('created_at',{ascending:false}).then(function(r){
+    if(r.error){console.error('Load error:',r.error);showToast('Error loading cases',true);return;}
+    CASES=r.data||[];
+    goPage('dash');
+  });
+}
 
-  /* APP */
-  #app { display: none; flex-direction: column; min-height: 100vh; }
-  
-  /* HEADER */
-  .header { background: #060c08; border-bottom: 1px solid var(--border); padding: 0 20px; position: sticky; top: 0; z-index: 100; }
-  .header-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
-  .logo { display: flex; align-items: center; gap: 10px; }
-  .logo-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green2); box-shadow: 0 0 8px var(--green2); }
-  .logo-text { font-family: var(--font-display); font-size: 17px; color: var(--green3); letter-spacing: 1px; }
-  .logo-badge { font-size: 8px; letter-spacing: 3px; color: var(--text3); text-transform: uppercase; display: none; }
-  @media(min-width:480px){ .logo-badge { display: block; } }
-  .header-actions { display: flex; align-items: center; gap: 8px; }
-  .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border2); object-fit: cover; cursor: pointer; }
-  .btn-new { background: var(--green2); color: #001a08; padding: 7px 14px; border: none; border-radius: 5px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 1px; cursor: pointer; transition: background 0.2s; }
-  .btn-new:hover { background: var(--green3); }
+function goPage(p){
+  PAGE=p;
+  ['dash','list','acct'].forEach(function(x){
+    var el=document.getElementById('nt-'+x);
+    if(el) el.className='ntab'+(x===p?' on':'');
+  });
+  render();
+}
 
-  /* NAV */
-  .nav { background: #060c08; border-bottom: 1px solid var(--border); padding: 0 20px; }
-  .nav-inner { max-width: 860px; margin: 0 auto; display: flex; gap: 0; }
-  .nav-tab { padding: 10px 16px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-  .nav-tab.active { color: var(--green3); border-bottom-color: var(--green2); }
-  .nav-tab:hover { color: var(--text2); }
+function render(){
+  var el=document.getElementById('pg');
+  if(PAGE==='dash') el.innerHTML=renderDash();
+  else if(PAGE==='list') el.innerHTML=renderList();
+  else if(PAGE==='form') el.innerHTML=renderForm();
+  else if(PAGE==='detail') el.innerHTML=renderDetail();
+  else if(PAGE==='acct') el.innerHTML=renderAcct();
+}
 
-  /* CONTENT */
-  .content { flex: 1; max-width: 860px; margin: 0 auto; width: 100%; padding: 24px 20px; }
+function newCase(){ EDIT_ID=null; IMGS=[]; PAGE='form'; render(); }
 
-  /* DASHBOARD */
-  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
-  @media(min-width:600px){ .stats-grid { grid-template-columns: repeat(4, 1fr); } }
-  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 18px 16px; text-align: center; }
-  .stat-num { font-family: var(--font-display); font-size: 40px; line-height: 1; margin-bottom: 4px; }
-  .stat-label { font-size: 9px; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; }
-
-  /* SECTION */
-  .section-hd { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
-
-  /* CASE CARDS */
-  .case-list { display: flex; flex-direction: column; gap: 8px; }
-  .case-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; cursor: pointer; transition: border-color 0.2s, transform 0.15s; }
-  .case-card:hover { border-color: var(--border2); transform: translateY(-1px); }
-  .case-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
-  .case-diag { font-family: var(--font-display); font-size: 15px; color: var(--text); line-height: 1.3; }
-  .case-date { font-size: 10px; color: var(--text3); white-space: nowrap; }
-  .case-meta { font-size: 10px; color: var(--text3); margin-bottom: 8px; }
-  .tags { display: flex; gap: 5px; flex-wrap: wrap; }
-  .tag { font-size: 9px; letter-spacing: 1px; padding: 2px 7px; border-radius: 3px; border: 1px solid var(--border); color: var(--text2); background: var(--bg); text-transform: uppercase; }
-  .tag.pub { border-color: #3a6a1a; color: #90d050; background: #0f1a08; }
-  .tag.trauma { border-color: #4a2a0a; color: #d09060; background: #1a0f04; }
-  .tag.tumour { border-color: #2a1a4a; color: #9080d0; background: #0a0810; }
-  .tag.paediatric { border-color: #3a1a4a; color: #c090e0; background: #100810; }
-  .tag.spine { border-color: #0a2a4a; color: #5090d0; background: #04080f; }
-  .tag.vascular { border-color: #3a0a0a; color: #d06060; background: #0f0404; }
-
-  /* FORM */
-  .form-section { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
-  .form-section-title { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--text3); margin-bottom: 16px; }
-  .field { margin-bottom: 14px; }
-  .field label { display: block; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 5px; }
-  .field input, .field select, .field textarea {
-    width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 5px;
-    color: var(--text); padding: 9px 11px; font-family: var(--font-mono); font-size: 13px;
-    outline: none; transition: border 0.2s; resize: vertical;
+function renderDash(){
+  var now=new Date();
+  var thisMonth=CASES.filter(function(c){try{var d=new Date(c.surgery_date||c.created_at);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}catch(e){return false;}}).length;
+  var pub=CASES.filter(function(c){return c.publishable;}).length;
+  var withImg=CASES.filter(function(c){return c.images&&c.images.length>0;}).length;
+  var byCat=CATS.map(function(s){return {s:s,n:CASES.filter(function(c){return c.category===s;}).length};}).filter(function(x){return x.n>0;});
+  var pubCases=CASES.filter(function(c){return c.publishable;}).slice(0,5);
+  var name=(USER.user_metadata&&USER.user_metadata.full_name)?USER.user_metadata.full_name.split(' ')[0]:'Doctor';
+  var html='<div class="sec-hd">Welcome back, '+name+'</div>';
+  html+='<div class="sgrid">';
+  html+='<div class="scard"><div class="snum" style="color:var(--green3)">'+CASES.length+'</div><div class="slbl">Total Cases</div></div>';
+  html+='<div class="scard"><div class="snum" style="color:#90d050">'+pub+'</div><div class="slbl">Publishable</div></div>';
+  html+='<div class="scard"><div class="snum" style="color:var(--blue)">'+thisMonth+'</div><div class="slbl">This Month</div></div>';
+  html+='<div class="scard"><div class="snum" style="color:var(--amber)">'+withImg+'</div><div class="slbl">With Images</div></div>';
+  html+='</div>';
+  if(byCat.length){
+    html+='<div class="sec-hd" style="margin-bottom:10px">By Category</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">';
+    byCat.forEach(function(x){html+='<div class="scard" style="padding:12px 16px;cursor:pointer;min-width:70px" onclick="filterCat(\''+x.s+'\')"><div class="snum" style="font-size:30px;color:var(--green3)">'+x.n+'</div><div class="slbl">'+x.s+'</div></div>';});
+    html+='</div>';
   }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--green2); }
-  .field select option { background: var(--bg2); }
+  if(pubCases.length){
+    html+='<div class="sec-hd" style="margin-bottom:10px">&#9733; Publishable Cases</div><div class="clist">';
+    pubCases.forEach(function(c){html+=cCard(c);});
+    html+='</div>';
+  }
+  if(CASES.length===0) html+='<div class="empty"><h3>No cases yet</h3><p>Start building your record</p><button class="btn-new" onclick="newCase()">Record First Case</button></div>';
+  return html;
+}
+
+function filterCat(c){FCAT=c;goPage('list');}
+
+function cCard(c){
+  var cat=(c.category||'').toLowerCase();
+  var meta=[c.age?c.age+'y':'',c.sex,c.procedure].filter(Boolean).join(' · ');
+  return '<div class="ccard" onclick="openCase(\''+c.id+'\')">'+
+    '<div class="ctop"><div class="cdiag">'+(c.diagnosis||'Untitled')+'</div><div class="cdate">'+fd(c.surgery_date)+'</div></div>'+
+    '<div class="cmeta">'+meta+'</div>'+
+    '<div class="tags">'+
+    (c.category?'<span class="tag '+cat+'">'+c.category+'</span>':'')+
+    (c.outcome?'<span class="tag">'+c.outcome+'</span>':'')+
+    (c.publishable?'<span class="tag pub">&#9733; Pub</span>':'')+
+    (c.images&&c.images.length?'<span class="tag">&#128247; '+c.images.length+'</span>':'')+
+    (c.histology?'<span class="tag">'+c.histology.substring(0,18)+'</span>':'')+
+    '</div></div>';
+}
+
+function renderList(){
+  var filtered=CASES.filter(function(c){
+    var q=SEARCH.toLowerCase();
+    var ms=!q||[c.diagnosis,c.histology,c.procedure,c.hospital_number,c.category].some(function(f){return f&&f.toLowerCase().includes(q);});
+    var mc=FCAT==='All'||c.category===FCAT;
+    var mp=!FPUB||c.publishable;
+    return ms&&mc&&mp;
+  });
+  var html='<div class="srow">'+
+    '<input class="sinp" placeholder="Search..." value="'+SEARCH+'" oninput="SEARCH=this.value;render()"/>'+
+    '<select class="fsel" onchange="FCAT=this.value;render()">'+
+    '<option value="All"'+(FCAT==='All'?' selected':'')+'>All</option>'+
+    CATS.map(function(s){return '<option value="'+s+'"'+(FCAT===s?' selected':'')+'>'+s+'</option>';}).join('')+
+    '</select>'+
+    '<label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text3);cursor:pointer">'+
+    '<input type="checkbox"'+(FPUB?' checked':'')+' onchange="FPUB=this.checked;render()" style="accent-color:var(--green)"/> Pub</label>'+
+    '</div>';
+  html+='<div style="font-size:10px;color:var(--text3);margin-bottom:10px;letter-spacing:1px">'+filtered.length+' case'+(filtered.length!==1?'s':'')+'</div>';
+  html+='<div class="clist">';
+  if(filtered.length) filtered.forEach(function(c){html+=cCard(c);}); 
+  else html='<div class="empty"><h3>No cases found</h3></div>';
+  html+='</div>';
+  return html;
+}
+
+function openCase(id){
+  var c=CASES.find(function(x){return x.id===id;});
+  if(!c) return;
+  window._DC=c;
+  PAGE='detail';
+  render();
+}
+
+function sel(opts,val){
+  return opts.map(function(o){return '<option'+(val===o?' selected':'')+'>'+o+'</option>';}).join('');
+}
+
+function renderForm(){
+  var c=EDIT_ID?( CASES.find(function(x){return x.id===EDIT_ID;})||{} ):{};
+  var imgHTML=IMGS.map(function(img){
+    return '<div class="iitem"><img src="'+img.data+'" alt=""/>'+
+      '<button class="iremove" onclick="removeImg(\''+img.id+'\')">&#215;</button>'+
+      '<div class="iitem-lbl"><input value="'+(img.label||'')+'" placeholder="Label..." onchange="labelImg(\''+img.id+'\',this.value)"/></div></div>';
+  }).join('');
+
+  return '<div class="back" onclick="goPage(\'list\')">&#8592; Back</div>'+
+  '<div style="font-family:var(--fd);font-size:22px;color:var(--text);margin-bottom:18px">'+(EDIT_ID?'Edit Case':'New Case')+'</div>'+
+
+  '<div class="fsec"><div class="fstitle">Patient</div>'+
+  '<div class="g3">'+
+  '<div class="fi"><label>Date of Surgery</label><input type="date" id="fd-d" value="'+(c.surgery_date||'')+'"/></div>'+
+  '<div class="fi"><label>Age</label><input id="fd-a" placeholder="e.g. 42" value="'+(c.age||'')+'"/></div>'+
+  '<div class="fi"><label>Sex</label><select id="fd-s"><option value="">&#8212;</option><option'+(c.sex==='Male'?' selected':'')+'>Male</option><option'+(c.sex==='Female'?' selected':'')+'>Female</option></select></div>'+
+  '</div>'+
+  '<div class="g2">'+
+  '<div class="fi"><label>Hospital Number</label><input id="fd-hn" placeholder="FTH/2024/001" value="'+(c.hospital_number||'')+'"/></div>'+
+  '<div class="fi"><label>Category</label><select id="fd-cat"><option value="">&#8212;</option>'+sel(CATS,c.category)+'</select></div>'+
+  '</div></div>'+
+
+  '<div class="fsec"><div class="fstitle">Clinical</div>'+
+  '<div class="fi"><label>Diagnosis &#9733;</label><input id="fd-diag" placeholder="Primary diagnosis" value="'+(c.diagnosis||'')+'"/></div>'+
+  '<div class="g3">'+
+  '<div class="fi"><label>GCS Admission</label><input id="fd-gcsi" placeholder="e.g. 12/15" value="'+(c.gcs_admission||'')+'"/></div>'+
+  '<div class="fi"><label>GCS Discharge</label><input id="fd-gcso" placeholder="e.g. 15/15" value="'+(c.gcs_discharge||'')+'"/></div>'+
+  '<div class="fi"><label>WHO Grade</label><input id="fd-who" placeholder="e.g. IV" value="'+(c.who_grade||'')+'"/></div>'+
+  '</div>'+
+  '<div class="fi"><label>Imaging Findings</label><textarea id="fd-img" rows="3" placeholder="Location, size, enhancement, oedema, midline shift...">'+(c.imaging_findings||'')+'</textarea></div>'+
+  '</div>'+
+
+  '<div class="fsec"><div class="fstitle">Surgery</div>'+
+  '<div class="g2">'+
+  '<div class="fi"><label>Procedure</label><select id="fd-proc"><option value="">&#8212;</option>'+sel(PROCS,c.procedure)+'</select></div>'+
+  '<div class="fi"><label>Extent of Resection</label><select id="fd-res"><option value="">&#8212;</option>'+sel(RESECS,c.extent_of_resection)+'</select></div>'+
+  '</div>'+
+  '<div class="fi"><label>Intraoperative Findings</label><textarea id="fd-iop" rows="3" placeholder="Tumour consistency, vascularity, bleeding...">'+(c.intraop_findings||'')+'</textarea></div>'+
+  '<div class="fi"><label>Complications</label><textarea id="fd-comp" rows="2" placeholder="Intraop or postop complications...">'+(c.complications||'')+'</textarea></div>'+
+  '</div>'+
+
+  '<div class="fsec"><div class="fstitle">Pathology</div>'+
+  '<div class="g2">'+
+  '<div class="fi"><label>HPE Diagnosis</label><input id="fd-histo" placeholder="e.g. Glioblastoma, IDH-wildtype" value="'+(c.histology||'')+'"/></div>'+
+  '<div class="fi"><label>IHC</label><input id="fd-ihc" placeholder="e.g. GFAP+, Ki-67 30%" value="'+(c.ihc||'')+'"/></div>'+
+  '</div></div>'+
+
+  '<div class="fsec"><div class="fstitle">Outcome</div>'+
+  '<div class="g3">'+
+  '<div class="fi"><label>Outcome</label><select id="fd-out"><option value="">&#8212;</option>'+sel(OUTCOMES,c.outcome)+'</select></div>'+
+  '<div class="fi"><label>GOS / mRS</label><input id="fd-gos" placeholder="e.g. GOS 4" value="'+(c.gos_score||'')+'"/></div>'+
+  '<div class="fi"><label>Follow-up</label><input id="fd-fu" placeholder="e.g. 6 months" value="'+(c.followup_duration||'')+'"/></div>'+
+  '</div>'+
+  '<div class="fi"><label>Adjuvant Treatment</label><input id="fd-adj" placeholder="e.g. Temozolomide + RT" value="'+(c.adjuvant_tx||'')+'"/></div>'+
+  '<div class="fi"><label>Notes / Learning Points</label><textarea id="fd-notes" rows="3" placeholder="Unusual features, publication ideas...">'+(c.notes||'')+'</textarea></div>'+
+  '</div>'+
+
+  '<div class="fsec"><div class="fstitle">Images</div>'+
+  '<label class="img-upload"><input type="file" id="fd-imgs" accept="image/*" multiple style="display:none" onchange="addImgs(event)"/>+ Add Photos / Imaging</label>'+
+  '<div id="ipreview" class="igrid">'+imgHTML+'</div>'+
+  '</div>'+
+
+  '<div class="fsec">'+
+  '<label class="pub-row">'+
+  '<input type="checkbox" id="fd-pub"'+(c.publishable?' checked':'')+'>'+
+  '<span class="pub-lbl">&#9733; Flag as Potentially Publishable</span>'+
+  '</label></div>'+
+
+  '<div class="save-bar">'+
+  '<button class="btn-save" id="sbtn" onclick="saveCase()">'+(EDIT_ID?'Update Case':'Save Case')+'</button>'+
+  '<button class="btn btn-ghost" onclick="goPage(\'list\')">Cancel</button>'+
+  '<span id="save-status" style="font-size:11px;letter-spacing:1px"></span>'+
+  '</div>';
+}
+
+function addImgs(e){
+  var files=Array.from(e.target.files);
+  var done=0;
+  files.forEach(function(f){
+    var r=new FileReader();
+    r.onload=function(ev){
+      IMGS.push({id:Date.now()+Math.random().toString(36).slice(2),name:f.name,data:ev.target.result,label:''});
+      done++;
+      if(done===files.length) document.getElementById('ipreview').innerHTML=IMGS.map(function(img){
+        return '<div class="iitem"><img src="'+img.data+'" alt=""/>'+
+        '<button class="iremove" onclick="removeImg(\''+img.id+'\')">&#215;</button>'+
+        '<div class="iitem-lbl"><input value="'+(img.label||'')+'" placeholder="Label..." onchange="labelImg(\''+img.id+'\',this.value)"/></div></div>';
+      }).join('');
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+function removeImg(id){IMGS=IMGS.filter(function(i){return i.id!==id;});document.getElementById('ipreview').innerHTML=IMGS.map(function(img){return '<div class="iitem"><img src="'+img.data+'" alt=""/><button class="iremove" onclick="removeImg(\''+img.id+'\')">&#215;</button><div class="iitem-lbl"><input value="'+(img.label||'')+'" placeholder="Label..." onchange="labelImg(\''+img.id+'\',this.value)"/></div></div>';}).join('');}
+function labelImg(id,v){var i=IMGS.find(function(x){return x.id===id;});if(i)i.label=v;}
+
+function saveCase(){
+  var diag=document.getElementById('fd-diag').value.trim();
+  if(!diag){showToast('Diagnosis is required',true);return;}
+  var btn=document.getElementById('sbtn');
+  var status=document.getElementById('save-status');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>Saving...';
+  status.innerHTML='<span style="color:var(--amber)">Connecting...</span>';
+
+  var payload={
+    user_id:USER.id,
+    surgery_date:document.getElementById('fd-d').value||null,
+    age:document.getElementById('fd-a').value||null,
+    sex:document.getElementById('fd-s').value||null,
+    hospital_number:document.getElementById('fd-hn').value||null,
+    category:document.getElementById('fd-cat').value||null,
+    diagnosis:diag,
+    gcs_admission:document.getElementById('fd-gcsi').value||null,
+    gcs_discharge:document.getElementById('fd-gcso').value||null,
+    who_grade:document.getElementById('fd-who').value||null,
+    imaging_findings:document.getElementById('fd-img').value||null,
+    procedure:document.getElementById('fd-proc').value||null,
+    extent_of_resection:document.getElementById('fd-res').value||null,
+    intraop_findings:document.getElementById('fd-iop').value||null,
+    complications:document.getElementById('fd-comp').value||null,
+    histology:document.getElementById('fd-histo').value||null,
+    ihc:document.getElementById('fd-ihc').value||null,
+    outcome:document.getElementById('fd-out').value||null,
+    gos_score:document.getElementById('fd-gos').value||null,
+    followup_duration:document.getElementById('fd-fu').value||null,
+    adjuvant_tx:document.getElementById('fd-adj').value||null,
+    notes:document.getElementById('fd-notes').value||null,
+    publishable:document.getElementById('fd-pub').checked,
+    images:IMGS
+  };
+
+  var promise;
+  if(EDIT_ID){
+    promise=sb.from('neurovault_cases').update(payload).eq('id',EDIT_ID).eq('user_id',USER.id).select().single();
+  } else {
+    promise=sb.from('neurovault_cases').insert(payload).select().single();
+  }
+
+  promise.then(function(r){
+    if(r.error){
+      console.error('Save error:',r.error);
+      status.innerHTML='<span style="color:var(--red)">&#10007; '+r.error.message+'</span>';
+      showToast('Error: '+r.error.message,true);
+      btn.disabled=false;
+      btn.textContent=EDIT_ID?'Update Case':'Save Case';
+    } else {
+      if(EDIT_ID){
+        var idx=CASES.findIndex(function(c){return c.id===EDIT_ID;});
+        if(idx>-1) CASES[idx]=r.data;
+      } else {
+        CASES.unshift(r.data);
+      }
+      status.innerHTML='<span style="color:var(--green3)">&#10003; Saved!</span>';
+      showToast(EDIT_ID?'Case updated &#10003;':'Case saved &#10003;');
+      EDIT_ID=null; IMGS=[];
+      setTimeout(function(){goPage('list');},700);
+    }
+  }).catch(function(ex){
+    console.error('Save exception:',ex);
+    status.innerHTML='<span style="color:var(--red)">&#10007; '+ex.message+'</span>';
+    showToast('Error: '+ex.message,true);
+    btn.disabled=false;
+    btn.textContent=EDIT_ID?'Update Case':'Save Case';
+  });
+}
+
+function renderDetail(){
+  var c=window._DC;
+  if(!c) return '<div class="back" onclick="goPage(\'list\')">&#8592; Back</div>';
+  var cat=(c.category||'').toLowerCase();
+  var html='<div class="back" onclick="goPage(\'list\')">&#8592; Back</div>';
+  html+='<div style="font-family:var(--fd);font-size:24px;color:var(--text);margin-bottom:10px;line-height:1.3">'+(c.diagnosis||'Untitled')+'</div>';
+  html+='<div class="tags" style="margin-bottom:14px">';
+  if(c.category) html+='<span class="tag '+cat+'">'+c.category+'</span>';
+  if(c.publishable) html+='<span class="tag pub">&#9733; Publishable</span>';
+  if(c.who_grade) html+='<span class="tag">WHO '+c.who_grade+'</span>';
+  if(c.histology) html+='<span class="tag">'+c.histology+'</span>';
+  html+='</div>';
+  html+='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
+  html+='<button class="btn btn-ghost" onclick="editCase(\''+c.id+'\')">Edit</button>';
+  html+='<button class="btn btn-danger" onclick="delCase(\''+c.id+'\')">Delete</button>';
+  html+='</div>';
+  html+='<div class="dblock"><div class="dbtitle">Patient</div><div class="drow">'+di('Date',fd(c.surgery_date))+di('Age',c.age)+di('Sex',c.sex)+di('Hospital No.',c.hospital_number)+'</div></div>';
+  if(c.imaging_findings) html+='<div class="dblock"><div class="dbtitle">Imaging</div><div class="dtxt">'+c.imaging_findings+'</div></div>';
+  html+='<div class="dblock"><div class="dbtitle">Surgery</div><div class="drow">'+di('Procedure',c.procedure)+di('Extent',c.extent_of_resection)+di('GCS In',c.gcs_admission)+di('GCS Out',c.gcs_discharge)+'</div>';
+  if(c.intraop_findings) html+='<div class="dtxt" style="margin-top:10px">'+c.intraop_findings+'</div>';
+  if(c.complications) html+='<div style="color:var(--red);font-size:12px;margin-top:8px">&#9888; '+c.complications+'</div>';
+  html+='</div>';
+  if(c.histology||c.ihc) html+='<div class="dblock"><div class="dbtitle">Pathology</div><div class="drow">'+di('HPE',c.histology)+di('IHC',c.ihc)+di('WHO Grade',c.who_grade)+'</div></div>';
+  html+='<div class="dblock"><div class="dbtitle">Outcome</div><div class="drow">'+di('Outcome',c.outcome)+di('GOS/mRS',c.gos_score)+di('Follow-up',c.followup_duration)+di('Adjuvant Tx',c.adjuvant_tx)+'</div></div>';
+  if(c.notes) html+='<div class="dblock"><div class="dbtitle">Notes</div><div class="dtxt">'+c.notes+'</div></div>';
+  if(c.images&&c.images.length){
+    html+='<div class="dblock"><div class="dbtitle">Images ('+c.images.length+')</div><div class="igrid">';
+    c.images.forEach(function(img){html+='<div class="iitem"><img src="'+img.data+'" alt="'+(img.label||'')+'"/>'+(img.label?'<div class="iitem-lbl" style="padding:4px 6px;font-size:9px;color:var(--text3)">'+img.label+'</div>':'')+'</div>';});
+    html+='</div></div>';
+  }
+  return html;
+}
+
+function di(l,v){return '<div><div class="dl">'+l+'</div><div class="dv">'+(v||'&#8212;')+'</div></div>';}
+
+function editCase(id){
+  EDIT_ID=id;
+  var c=CASES.find(function(x){return x.id===id;});
+  IMGS=c&&c.images?JSON.parse(JSON.stringify(c.images)):[];
+  PAGE='form';render();
+}
+
+function delCase(id){
+  if(!confirm('Delete this case? Cannot be undone.')) return;
+  sb.from('neurovault_cases').delete().eq('id',id).eq('user_id',USER.id).then(function(r){
+    if(!r.error){CASES=CASES.filter(function(c){return c.id!==id;});showToast('Case deleted');goPage('list');}
+    else showToast('Error deleting',true);
+  });
+}
+
+function renderAcct(){
+  var name=(USER.user_metadata&&USER.user_metadata.full_name)?USER.user_metadata.full_name:'Doctor';
+  return '<div style="font-family:var(--fd);font-size:22px;color:var(--text);margin-bottom:18px">Account</div>'+
+  '<div class="dblock"><div class="dbtitle">Signed In As</div>'+
+  '<div style="font-size:14px;color:var(--text);margin-bottom:4px">'+name+'</div>'+
+  '<div style="font-size:11px;color:var(--text3);margin-bottom:16px">'+USER.email+'</div>'+
+  '<button class="btn btn-danger" onclick="doSignOut()">Sign Out</button></div>'+
+  '<div class="dblock"><div class="dbtitle">Your Data</div>'+
+  '<div class="drow" style="margin-bottom:10px">'+di('Total Cases',CASES.length)+di('Publishable',CASES.filter(function(c){return c.publishable;}).length)+di('With Images',CASES.filter(function(c){return c.images&&c.images.length;}).length)+'</div>'+
+  '<div style="font-size:10px;color:var(--text3);line-height:1.7">Stored securely in the cloud. Only you can access your cases.</div></div>'+
+  '<div class="dblock"><div class="dbtitle">Install on Phone</div>'+
+  '<div style="font-size:12px;color:var(--text2);line-height:1.8">'+
+  '<b style="color:var(--text)">iPhone (Safari):</b> Share &#8594; Add to Home Screen<br/>'+
+  '<b style="color:var(--text)">Android (Chrome):</b> Menu &#8594; Add to Home Screen</div></div>';
+}
+
+function fd(d){
+  if(!d) return '&#8212;';
+  try{var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}catch(e){return d;}
+}
+
+function showToast(msg,err){
+  var el=document.getElementById('toast-el');
+  el.innerHTML=msg;
+  el.className='toast '+(err?'terr':'tok');
+  el.style.display='block';
+  clearTimeout(window._tt);
+  window._tt=setTimeout(function(){el.style.display='none';},3000);
+}
+
+sb.auth.getSession().then(function(r){
+  if(!r.data.session) document.getElementById('auth').style.display='flex';
+});
+</script>
+</body>
+</html>  .field select option { background: var(--bg2); }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
   @media(max-width:520px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
