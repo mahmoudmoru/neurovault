@@ -254,7 +254,7 @@ sb.auth.onAuthStateChange(function(event, session){
     document.getElementById('auth').style.display='none';
     document.getElementById('app').style.display='flex';
     document.getElementById('app').style.flexDirection='column';
-    if(!window._appReady){ window._appReady=true; loadCases(); }
+    if(!window._appReady){ window._appReady=true; PAGE='dash'; loadCases(); }
   } else {
     USER=null;
     window._appReady=false;
@@ -267,7 +267,7 @@ function loadCases(){
   sb.from('neurovault_cases').select('*').eq('user_id',USER.id).order('created_at',{ascending:false}).then(function(r){
     if(r.error){console.error('Load error:',r.error);showToast('Error loading cases',true);return;}
     CASES=r.data||[];
-    if(PAGE==='dash') goPage('dash'); else render();
+    render();
   });
 }
 
@@ -530,7 +530,7 @@ function saveCase(){
       status.innerHTML='<span style="color:var(--green3)">&#10003; Saved!</span>';
       showToast(EDIT_ID?'Case updated &#10003;':'Case saved &#10003;');
       EDIT_ID=null; IMGS=[];
-      setTimeout(function(){goPage('list');},700);
+      setTimeout(function(){PAGE='list';render();},700);
     }
   }).catch(function(ex){
     console.error('Save exception:',ex);
