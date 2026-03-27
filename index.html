@@ -19,6 +19,14 @@
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fm);overflow-x:hidden}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+#lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.95);z-index:1000;align-items:center;justify-content:center;flex-direction:column;padding:16px}
+#lightbox.on{display:flex}
+#lightbox img{max-width:100%;max-height:78vh;object-fit:contain;border-radius:4px}
+#lb-lbl{color:#8ab89a;font-family:'Source Code Pro',monospace;font-size:11px;letter-spacing:1px;margin-top:12px;text-align:center}
+#lb-close{position:absolute;top:14px;right:18px;color:#fff;font-size:30px;cursor:pointer;background:none;border:none;line-height:1}
+#lb-nav{display:flex;gap:16px;margin-top:14px}
+.lnav{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 16px;border-radius:4px;font-family:'Source Code Pro',monospace;font-size:11px;cursor:pointer}
+.lnav:hover{background:rgba(255,255,255,.2)}
 #auth{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:radial-gradient(ellipse at 50% 0%,#0d2a18,var(--bg) 70%)}
 .auth-logo{font-family:var(--fd);font-size:44px;color:var(--green3);letter-spacing:2px;margin-bottom:4px}
 .auth-sub{font-size:10px;letter-spacing:4px;color:var(--text3);text-transform:uppercase;margin-bottom:40px}
@@ -168,6 +176,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 <div id="toast-el" style="display:none"></div>
 
+<div id="lightbox" onclick="closeLB(event)">
+  <button id="lb-close" onclick="closeLB()">&#215;</button>
+  <img id="lb-img" src="" alt=""/>
+  <div id="lb-lbl"></div>
+  <div id="lb-nav">
+    <button class="lnav" onclick="lbNav(-1);event.stopPropagation()">&#8592; Prev</button>
+    <button class="lnav" onclick="lbNav(1);event.stopPropagation()">Next &#8594;</button>
+  </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 var sb = supabase.createClient(
@@ -551,7 +568,7 @@ function renderDetail(){
   if(c.notes) html+='<div class="dblock"><div class="dbtitle">Notes</div><div class="dtxt">'+c.notes+'</div></div>';
   if(c.images&&c.images.length){
     html+='<div class="dblock"><div class="dbtitle">Images ('+c.images.length+')</div><div class="igrid">';
-    c.images.forEach(function(img){html+='<div class="iitem"><img src="'+img.data+'" alt="'+(img.label||'')+'"/>'+(img.label?'<div class="iitem-lbl" style="padding:4px 6px;font-size:9px;color:var(--text3)">'+img.label+'</div>':'')+'</div>';});
+    c.images.forEach(function(img,idx){html+='<div class="iitem" style="cursor:zoom-in" onclick="openLB('+idx+')"><img src="'+img.data+'" alt="'+(img.label||'')+'"/>'+(img.label?'<div class="iitem-lbl" style="padding:4px 6px;font-size:9px;color:var(--text3)">'+img.label+'</div>':'')+'</div>';});
     html+='</div></div>';
   }
   return html;
@@ -595,6 +612,28 @@ function fd(d){
   try{var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}catch(e){return d;}
 }
 
+var _lbImgs=[], _lbIdx=0;
+function openLB(idx){
+  _lbImgs=window._DC&&window._DC.images?window._DC.images:[];
+  _lbIdx=idx;
+  var img=_lbImgs[_lbIdx];
+  if(!img) return;
+  document.getElementById('lb-img').src=img.data;
+  document.getElementById('lb-lbl').textContent=img.label||'';
+  document.getElementById('lightbox').className='on';
+  document.getElementById('lb-nav').style.display=_lbImgs.length>1?'flex':'none';
+}
+function closeLB(e){
+  if(!e||e.target===document.getElementById('lightbox')||e.target===document.getElementById('lb-close')){
+    document.getElementById('lightbox').className='';
+  }
+}
+function lbNav(dir){
+  _lbIdx=(_lbIdx+dir+_lbImgs.length)%_lbImgs.length;
+  var img=_lbImgs[_lbIdx];
+  document.getElementById('lb-img').src=img.data;
+  document.getElementById('lb-lbl').textContent=img.label||'';
+}
 function showToast(msg,err){
   var el=document.getElementById('toast-el');
   el.innerHTML=msg;
