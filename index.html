@@ -237,9 +237,10 @@ sb.auth.onAuthStateChange(function(event, session){
     document.getElementById('auth').style.display='none';
     document.getElementById('app').style.display='flex';
     document.getElementById('app').style.flexDirection='column';
-    loadCases();
+    if(!window._appReady){ window._appReady=true; loadCases(); }
   } else {
     USER=null;
+    window._appReady=false;
     document.getElementById('auth').style.display='flex';
     document.getElementById('app').style.display='none';
   }
@@ -249,7 +250,7 @@ function loadCases(){
   sb.from('neurovault_cases').select('*').eq('user_id',USER.id).order('created_at',{ascending:false}).then(function(r){
     if(r.error){console.error('Load error:',r.error);showToast('Error loading cases',true);return;}
     CASES=r.data||[];
-    goPage('dash');
+    if(PAGE==='dash') goPage('dash'); else render();
   });
 }
 
