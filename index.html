@@ -267,7 +267,7 @@ function loadCases(){
   sb.from('neurovault_cases').select('*').eq('user_id',USER.id).order('created_at',{ascending:false}).then(function(r){
     if(r.error){console.error('Load error:',r.error);showToast('Error loading cases',true);return;}
     CASES=r.data||[];
-    render();
+    goPage(PAGE);
   });
 }
 
